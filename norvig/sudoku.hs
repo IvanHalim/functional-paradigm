@@ -12,7 +12,7 @@ cross rows cols = [(r,c) | r <- rows, c <- cols]
 digits  = "123456789"
 rows    = "ABCDEFGHI"
 cols    = digits
-box = (('A','1'), ('I','9'))
+box     = (('A','1'), ('I','9'))
 
 squares :: [Square]
 squares = cross rows cols
