@@ -62,7 +62,7 @@ eliminate :: Grid -> (Square, Digit) -> Maybe Grid
 eliminate g (s,d)
     | d `notElem` cell = Just g
     | otherwise        = case newGrid2 of
-        Just x  -> foldM (locate d) x (access s units)
+        Just g' -> foldM (locate d) g' (access s units)
         Nothing -> Nothing
     where
         cell     = access s g
