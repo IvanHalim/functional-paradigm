@@ -67,7 +67,7 @@ eliminate g (s,d) =
             newGrid2 <- case newCell of
                 []      -> Nothing
                 [d']    -> let peersOfS = access s peers
-                            in foldM eliminate newGrid (zip peersOfS (repeat d'))
+                           in foldM eliminate newGrid (zip peersOfS (repeat d'))
                 _       -> return newGrid
             foldM (locate d) newGrid2 (access s units)
 
