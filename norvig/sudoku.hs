@@ -42,67 +42,21 @@ emptyGrid :: Grid
 emptyGrid = Map.fromList [(s, digits) | s <- squares]
 
 regular :: String -> Bool
-regular grid = length (filter (`elem` "0.123456789") grid) == 81
+regular grid = length (filter (`elem` validDigit) grid) == 81
+    where
+        validDigit = "0." ++ digits
 
-parse_grid :: String -> Maybe Grid
-parse_grid grid
+parseGrid :: String -> Maybe Grid
+parseGrid grid
     | regular grid = foldM assign emptyGrid (zip squares grid)
     | otherwise    = Nothing
 
 assign :: Grid -> (Square, Digit) -> Maybe Grid
 assign g (s,d)
-    | elem d digits = foldM eliminate g (zip (repeat s) other_values)
+    | elem d digits = foldM eliminate g (zip (repeat s) otherValues)
     | otherwise     = Just g
     where
-        other_values = delete d (access s g)
-
-{-eliminate :: Grid -> (Square, Digit) -> Maybe Grid
-eliminate g (s,d) =
-    let cell = access s g
-    in if d `notElem` cell
-        then return g
-        else do
-            let newCell = delete d cell
-                newGrid = Map.insert s newCell g
-            newGrid2 <- case newCell of
-                []      -> Nothing
-                [d']    -> let peersOfS = access s peers
-                           in foldM eliminate newGrid (zip peersOfS (repeat d'))
-                _       -> return newGrid
-            foldM (locate d) newGrid2 (access s units)-}
-
-{-eliminate :: Grid -> (Square, Digit) -> Maybe Grid
-eliminate g (s,d)
-    | d `notElem` cell = Just g
-    | otherwise        = case newGrid2 of
-        Just x  -> foldM (locate d) x (access s units)
-        Nothing -> Nothing
-    where
-        cell     = access s g
-        newGrid2 = case newCell of
-            []   -> Nothing
-            [d'] -> foldM eliminate newGrid (zip peersOfS (repeat d'))
-            _    -> Just newGrid
-            where
-                newCell  = delete d cell
-                newGrid  = Map.insert s newCell g
-                peersOfS = access s peers-}
-
-{-eliminate :: Grid -> (Square, Digit) -> Maybe Grid
-eliminate g (s,d) =
-    let cell     = access s g
-        newCell  = delete d cell
-        newGrid  = Map.insert s newCell g
-        peersOfS = access s peers
-        newGrid2 = case newCell of
-            []   -> Nothing
-            [d'] -> foldM eliminate newGrid (zip peersOfS (repeat d'))
-            _    -> Just newGrid
-    in if d`notElem` cell
-        then Just g
-        else case newGrid2 of
-            Just x  -> foldM (locate d) x (access s units)
-            Nothing -> Nothing-}
+        otherValues = delete d (access s g)
 
 eliminate :: Grid -> (Square, Digit) -> Maybe Grid
 eliminate g (s,d)
@@ -121,10 +75,11 @@ eliminate g (s,d)
             _    -> Just newGrid
 
 locate :: Digit -> Grid -> Unit -> Maybe Grid
-locate d g u = case filter ((d `elem`) . (`access` g)) u of
-                    []  -> Nothing
-                    [s] -> assign g (s,d)
-                    _   -> Just g
+locate d g u =
+    case filter ((d `elem`) . (`access` g)) u of
+        []  -> Nothing
+        [s] -> assign g (s,d)
+        _   -> Just g
 
 
 main :: IO ()
