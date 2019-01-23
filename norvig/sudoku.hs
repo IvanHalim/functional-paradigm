@@ -38,11 +38,11 @@ peers = Map.fromList [(s, set (access s units)) | s <- squares]
     where
         set = nub . concat
 
-regular :: String -> Bool
-regular grid = length (filter (`elem` "0.123456789") grid) == 81
-
 emptyGrid :: Grid
 emptyGrid = Map.fromList [(s, digits) | s <- squares]
+
+regular :: String -> Bool
+regular grid = length (filter (`elem` "0.123456789") grid) == 81
 
 parse_grid :: String -> Maybe Grid
 parse_grid grid
