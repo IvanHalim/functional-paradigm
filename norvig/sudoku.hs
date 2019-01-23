@@ -124,7 +124,7 @@ locate :: Digit -> Grid -> Unit -> Maybe Grid
 locate d g u = case filter ((d `elem`) . (`access` g)) u of
                     []  -> Nothing
                     [s] -> assign g (s,d)
-                    _   -> return g
+                    _   -> Just g
 
 
 main :: IO ()
