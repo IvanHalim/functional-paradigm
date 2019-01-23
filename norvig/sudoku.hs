@@ -28,7 +28,7 @@ unitlist = [cross rows [c]  | c  <- cols] ++
                               cs <- ["123","456","789"]]
 
 units :: Map Square [Unit]
-units = Map.fromList [(s, [filter (/= s) u | u <- unitlist, elem s u]) | s <- squares]
+units = Map.fromList [(s, [delete s u | u <- unitlist, elem s u]) | s <- squares]
 
 access :: Square -> Map Square a -> a
 access s g = fromJust (Map.lookup s g)
@@ -54,7 +54,7 @@ assign g (s,d)
     | elem d digits = foldM eliminate g (zip (repeat s) other_values)
     | otherwise     = Just g
     where
-        other_values = filter (/= d) (access s g)
+        other_values = delete d (access s g)
 
 eliminate :: Grid -> (Square, Digit) -> Maybe Grid
 eliminate g (s,d) =
