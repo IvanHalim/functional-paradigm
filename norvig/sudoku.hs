@@ -50,14 +50,32 @@ parse_grid grid
     | otherwise    = Nothing
 
 assign :: Grid -> (Square, Digit) -> Maybe Grid
-assign g (s,d) = foldM (eliminate s) g (filter (/= d) (access s g))
+assign g (s,d)
+    | elem d digits = foldM eliminate g (zip (repeat s) other_values)
+    | otherwise     = Just g
+    where
+        other_values = filter (/= d) (access s g)
 
-eliminate :: Square -> Grid -> Digit -> Maybe Grid
-eliminate = undefined
-{-eliminate s g d
-    | not elem d (access s g)                  = Just g
-    | length (filter (/= d) (access s g)) == 0 = Nothing
-    | otherwise =-}
+eliminate :: Grid -> (Square, Digit) -> Maybe Grid
+eliminate g (s,d) =
+    let cell = access s g
+    in if d `notElem` cell
+        then return g
+        else do
+            let newCell = delete d cell
+                newGrid = Map.insert s newCell g
+            newGrid2 <- case newCell of
+                []      -> Nothing
+                [d']    -> let peersOfS = access s peers
+                            in foldM eliminate newGrid (zip peersOfS (repeat d'))
+                _       -> return newGrid
+            foldM (locate d) newGrid2 (access s units)
+
+locate :: Digit -> Grid -> Unit -> Maybe Grid
+locate d g u = case filter ((d `elem`) . (`access` g)) u of
+                    []  -> Nothing
+                    [s] -> assign g (s,d)
+                    _   -> return g
 
 
 main :: IO ()
