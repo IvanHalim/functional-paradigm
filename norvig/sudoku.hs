@@ -4,6 +4,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.List
 import Data.Maybe
+import Control.Monad
 
 type Square = String
 type Unit   = [Square]
@@ -29,24 +30,35 @@ unitlist = [cross rows [c]  | c  <- cols] ++
 units :: Map Square [Unit]
 units = Map.fromList [(s, [filter (/= s) u | u <- unitlist, elem s u]) | s <- squares]
 
-set :: Eq a => Maybe [[a]] -> [a]
-set Nothing  = []
-set (Just x) = nub (concat x)
+access :: Square -> Map Square a -> a
+access s g = fromJust (Map.lookup s g)
 
 peers :: Map Square [Square]
-peers = Map.fromList [(s, set (Map.lookup s units)) | s <- squares]
+peers = Map.fromList [(s, set (access s units)) | s <- squares]
+    where
+        set = nub . concat
+
+regular :: String -> Bool
+regular grid = length (filter (`elem` "0.123456789") grid) == 81
 
 emptyGrid :: Grid
 emptyGrid = Map.fromList [(s, digits) | s <- squares]
 
 parse_grid :: String -> Maybe Grid
-parse_grid = undefined
+parse_grid grid
+    | regular grid = foldM assign emptyGrid (zip squares grid)
+    | otherwise    = Nothing
 
-grid_values :: String -> Maybe ([(Square, Char)])
-grid_values grid =
-    let chars = [c | c <- grid, elem c "0.123456789"] in
-        if length chars /= 81 then Nothing
-        else Just (zip squares chars)
+assign :: Grid -> (Square, Digit) -> Maybe Grid
+assign g (s,d) = foldM (eliminate s) g (filter (/= d) (access s g))
+
+eliminate :: Square -> Grid -> Digit -> Maybe Grid
+eliminate = undefined
+{-eliminate s g d
+    | not elem d (access s g)                  = Just g
+    | length (filter (/= d) (access s g)) == 0 = Nothing
+    | otherwise =-}
+
 
 main :: IO ()
 main = return ()
