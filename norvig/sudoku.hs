@@ -80,9 +80,9 @@ eliminate g (s,d)
     where
         cell     = access s g
         newGrid2 = case newCell of
-            []      -> Nothing
-            [d']    -> foldM eliminate newGrid (zip peersOfS (repeat d'))
-            _       -> Just newGrid
+            []   -> Nothing
+            [d'] -> foldM eliminate newGrid (zip peersOfS (repeat d'))
+            _    -> Just newGrid
             where
                 newCell  = delete d cell
                 newGrid  = Map.insert s newCell g
