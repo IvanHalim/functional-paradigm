@@ -109,8 +109,8 @@ centerString n s = lead ++ s ++ trail
     where
         l = (n - length s) `div` 2
         t = n - length s - l
-        lead  = take l $ repeat ' '
-        trail = take t $ repeat ' '
+        lead  = replicate l ' '
+        trail = replicate t ' '
 
 gridToString :: Maybe Grid -> String
 gridToString Nothing  = ""
@@ -120,11 +120,11 @@ gridToString (Just g) = unlines l5
         l1 = map (centerString width) l0
         l2 = map concat $ sublist 3 l1
         l3 = sublist 3 l2
-        l4 = map (concat . intersperse "|") l3
-        l5 = concat $ intersperse [line] $ sublist 3 l4
+        l4 = map (intercalate "|") l3
+        l5 = intercalate [line] $ sublist 3 l4
         width   = 1 + maximum [length $ access s g | s <- squares]
-        hyphens = take (width*3) $ repeat '-'
-        line    = concat $ intersperse "+" $ take 3 $ repeat hyphens
+        hyphens = replicate (width*3) '-'
+        line    = intercalate "+" $ replicate 3 hyphens
 
 display :: Maybe Grid -> IO ()
 display = putStrLn. gridToString
