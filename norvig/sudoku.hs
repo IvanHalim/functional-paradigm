@@ -81,6 +81,24 @@ locate d g u =
         [s] -> assign g (s,d)
         _   -> Just g
 
+some :: Maybe a -> Maybe a -> Maybe a
+some Nothing  Nothing  = Nothing
+some Nothing  (Just x) = Just x
+some (Just x) _        = Just x
+
+allSizeOne :: Grid -> Bool
+allSizeOne g = all (\xs -> length xs == 1) [access s g | s <- squares]
+
+search :: Maybe Grid -> Maybe Grid
+search Nothing  = Nothing
+search (Just g)
+    | allSizeOne g = Just g
+    | otherwise    = foldl' some Nothing [search (assign g (s, d)) | d <- access s g]
+    where
+        (_, s) = minimum [(length (access s g), s) | s <- squares, length (access s g) > 1]
+
+solve :: String -> Maybe Grid
+solve grid = search (parseGrid grid)
 
 main :: IO ()
 main = return ()
