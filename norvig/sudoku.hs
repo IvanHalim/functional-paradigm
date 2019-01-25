@@ -100,5 +100,38 @@ search (Just g)
 solve :: String -> Maybe Grid
 solve grid = search (parseGrid grid)
 
+sublist :: Int -> [a] -> [[a]]
+sublist n [] = []
+sublist n xs = take n xs : sublist n (drop n xs)
+
+centerString :: Int -> String -> String
+centerString n s = lead ++ s ++ trail
+    where
+        l = (n - length s) `div` 2
+        t = n - length s - l
+        lead  = take l $ repeat ' '
+        trail = take t $ repeat ' '
+
+gridToString :: Maybe Grid -> String
+gridToString Nothing  = ""
+gridToString (Just g) = unlines l5
+    where
+        l0 = map snd $ Map.toList g
+        l1 = map (centerString width) l0
+        l2 = map concat $ sublist 3 l1
+        l3 = sublist 3 l2
+        l4 = map (concat . intersperse "|") l3
+        l5 = concat $ intersperse [line] $ sublist 3 l4
+        width   = 1 + maximum [length $ access s g | s <- squares]
+        hyphens = take (width*3) $ repeat '-'
+        line    = concat $ intersperse "+" $ take 3 $ repeat hyphens
+
+display :: Maybe Grid -> IO ()
+display = putStrLn. gridToString
+
+grid1  = "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
+grid2  = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+hard1  = ".....6....59.....82....8....45........3........6..3.54...325..6.................."
+
 main :: IO ()
 main = return ()
