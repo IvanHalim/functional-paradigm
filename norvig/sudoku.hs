@@ -122,7 +122,7 @@ gridToString (Just g) = unlines l5
         l4 = map (intercalate "|") (sublist 3 l3)
         l5 = intercalate [line] (sublist 3 l4)
         width   = 1 + maximum [length (access s g) | s <- squares]
-        hyphens = replicate (width*3) '-'
+        hyphens = replicate (width * 3) '-'
         line    = intercalate "+" (replicate 3 hyphens)
 
 display :: Maybe Grid -> IO ()
