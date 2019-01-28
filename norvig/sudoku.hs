@@ -52,14 +52,14 @@ parseGrid grid
     | otherwise    = Nothing
 
 assign :: Grid -> (Square, Digit) -> Maybe Grid
-assign g (s,d)
+assign g (s, d)
     | elem d digits = foldM eliminate g (zip (repeat s) otherValues)
     | otherwise     = Just g
     where
         otherValues = delete d (access s g)
 
 eliminate :: Grid -> (Square, Digit) -> Maybe Grid
-eliminate g (s,d)
+eliminate g (s, d)
     | d `notElem` cell = Just g
     | otherwise        = case newGrid2 of
         Just g' -> foldM (locate d) g' (access s units)
@@ -78,7 +78,7 @@ locate :: Digit -> Grid -> Unit -> Maybe Grid
 locate d g u =
     case filter ((d `elem`) . (`access` g)) u of
         []  -> Nothing
-        [s] -> assign g (s,d)
+        [s] -> assign g (s, d)
         _   -> Just g
 
 some :: Maybe a -> Maybe a -> Maybe a
