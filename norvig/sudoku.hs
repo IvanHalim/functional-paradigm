@@ -116,14 +116,14 @@ gridToString :: Maybe Grid -> String
 gridToString Nothing  = ""
 gridToString (Just g) = unlines l5
     where
-        l1 = map snd $ Map.toList g
+        l1 = map snd (Map.toList g)
         l2 = map (centerString width) l1
-        l3 = map concat $ sublist 3 l2
-        l4 = map (intercalate "|") $ sublist 3 l3
-        l5 = intercalate [line] $ sublist 3 l4
-        width   = 1 + maximum [length $ access s g | s <- squares]
+        l3 = map concat (sublist 3 l2)
+        l4 = map (intercalate "|") (sublist 3 l3)
+        l5 = intercalate [line] (sublist 3 l4)
+        width   = 1 + maximum [length (access s g) | s <- squares]
         hyphens = replicate (width*3) '-'
-        line    = intercalate "+" $ replicate 3 hyphens
+        line    = intercalate "+" (replicate 3 hyphens)
 
 display :: Maybe Grid -> IO ()
 display = putStrLn. gridToString
