@@ -143,7 +143,7 @@ steps n =
 macros :: Prog -> [Macro]
 macros [] = []
 macros (x:xs) = case x of
-    Define m _ _ -> m : macros xs
+    Define m _ p -> m : macros p ++ macros xs
     otherwise    -> macros xs
 
 
