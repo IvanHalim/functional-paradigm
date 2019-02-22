@@ -68,3 +68,62 @@ genSum :: [Int] -> Prog
 genSum []     = [PushI 0]
 genSum (i:is) = genSum is ++ [PushI i, Add]
 -- genSum (i:is) = [PushI i] ++ genSum is ++ [Add]
+
+
+
+--
+-- * Semantics of StackLang (now!)
+--
+
+
+-- 6. Identify/define a semantics domain for Cmd and for Prog.
+--    Things we need:
+--      * stack
+--        * int
+--        * bool
+--      * error
+--        * type error
+--        * underflow
+
+type Stack = [Either Int Bool]
+
+type Domain = Stack -> Maybe Stack
+
+
+-- 7. Define the semantics of a StackLang command (ignore If at first).
+cmd :: Cmd -> Domain
+cmd (PushI i)    = \s -> Just (Left i : s)
+cmd (PushB b)    = \s -> Just (Right b : s)
+cmd Add          = \s -> case s of
+                           (Left i : Left j : s') -> Just (Left (i+j) : s')
+                           _ -> Nothing
+cmd Equ          = \s -> case s of
+                           (Left i : Left j : s') -> Just (Right (i==j) : s')
+                           (Right b : Right c : s') -> Just (Right (b==c) : s')
+                           _ -> Nothing
+cmd (IfElse t e) = \s -> case s of
+                           (Right True : s')  -> prog t s'
+                           (Right False : s') -> prog e s'
+                           _ -> Nothing
+
+-- 8. Define the semantics of a StackLang program.
+prog :: Prog -> Domain
+prog []    = \s -> Just s
+prog (c:p) = \s -> case cmd c s of
+                     Just s' -> prog p s'
+                     Nothing -> Nothing
+
+
+-- | Run a program on an initially empty stack.
+--
+--   >>> run ex2
+--   Just [Right False]
+--
+--   >>> run (genSum [1..10])
+--   Just [Left 55]
+--
+--   >>> run [PushN 3, Add, PushN 4]
+--   Nothing
+--
+run :: Prog -> Maybe Stack
+run p = prog p []
